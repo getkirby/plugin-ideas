@@ -17,7 +17,7 @@ Unofficial documentation for Kirby CMS. It is **not** maintained by the Kirby te
 
 #### Build process
 
-- Add this `package.json` in the root of your plugin folder:
+- Add this `package.json` (annotated version [here](extras/annotated-package.md)) in the root of your plugin folder:
 
 ```json
 {
