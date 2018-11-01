@@ -86,6 +86,16 @@ props: {
 }
 ```
 
+If you are storing an `Array`, you need to explicitely state in your php props that you want to work with a decoded value:
+
+```php
+'props' => array(
+    'value' => function ($value = null) {
+        return Yaml::decode($value);
+    }
+),
+```
+
 #### Tell Kirby there's new content to save
 
 Having an 'input' method, that you call with `@input` will do most of the job:
