@@ -135,7 +135,8 @@ Here's a snippet to get the current language code (remove `.code` to get the who
 ```javascript
 computed: {
     currentLanguage() {
-        return this.$store.state.languages.current.code // returns en, fr, ...
+        let current = this.$store.state.languages.current
+        return current ? current.code : false // returns en, fr, ... if multi-language
     }
 },
 watch: {
