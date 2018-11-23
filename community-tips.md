@@ -172,7 +172,7 @@ export default {
 ```javascript
 export default {
     watch: {
-        pageValues: {
+        syncedValue: {
             immediate: true,
             handler() {
                 if(!this.syncedValue) return false
