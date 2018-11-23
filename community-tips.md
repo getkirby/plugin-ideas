@@ -1,8 +1,11 @@
 Community/slack-gathered tips for working on kirby plugins. <br/>
 Unofficial documentation for Kirby CMS. It is **not** maintained by the Kirby team.
 
-- [Plugin architecture](#plugin-architecture)
-  * [Build process](#build-process)
+Last edit: 23.11.2018. K3 moves fast, some things may be outdated.
+
+- [Build processes](#build-processes)
+  * [Browserify](#browserify)
+  * [Parcel](#parcel)
 - [Fields](#fields)
   * [Work with your field's value](#work-with-your-fields-value)
   * [Tell Kirby there's new content to save](#tell-kirby-theres-new-content-to-save)
@@ -13,9 +16,11 @@ Unofficial documentation for Kirby CMS. It is **not** maintained by the Kirby te
 <br/>
 
 
-## Plugin architecture
+## Build processes
 
-#### Build process
+See [this Slack discussion](https://getkirby.slack.com/archives/CBY2BA82E/p1542815307052700) for more details about build processes. **Browserify** seems to be the most reliable at the moment.
+
+#### Browserify
 
 - Add this `package.json` (annotated version [here](extras/annotated-package.md)) in the root of your plugin folder:
 
@@ -69,6 +74,10 @@ Unofficial documentation for Kirby CMS. It is **not** maintained by the Kirby te
   * `npm run dev` when working on the plugin, live updates and hot-reload.
   * `npm run build` mandatory to publish your plugin. Will extract js and css.
 
+
+#### Parcel
+
+Check out [this boilerplate repo](https://github.com/medienbaecker/kirby3-boilerplate) (may have some pitfalls, check the above Slack thread).
 
 <br/>
 
