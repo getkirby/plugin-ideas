@@ -6,6 +6,8 @@ Last edit: 23.11.2018. K3 moves fast, some things may be outdated.
 - [Build processes](#build-processes)
   * [Browserify](#browserify)
   * [Parcel](#parcel)
+- [Fields & Sections](#fields-sections)
+  * [Get / sync content with other field(s)](#get-sync-content-with-other-fields)
 - [Fields](#fields)
   * [Work with your field's value](#work-with-your-fields-value)
   * [Tell Kirby there's new content to save](#tell-kirby-theres-new-content-to-save)
@@ -78,6 +80,127 @@ See [this Slack discussion](https://getkirby.slack.com/archives/CBY2BA82E/p15428
 #### Parcel
 
 Check out [this boilerplate repo](https://github.com/medienbaecker/kirby3-boilerplate) (may have some pitfalls, check the above Slack thread).
+
+<br/>
+
+## Fields & Sections
+
+#### Get / sync content with other field(s)
+
+Let's say you have a section `mysection` (works with a field too) and a field `myfield` in the same page. You want `mysection` to listen to `myfield`, sync its value and update it if needed.
+
+- Mention in your blueprint the `key` of the field you'd like to listen to:
+
+```yaml
+mysection:
+  label: Custom section
+  type: mysection
+  sync: myfield
+
+myfield:
+  label: Message
+  type: text
+```
+
+- In your section's `index.php`, pass the `sync` key as a props:
+
+```php
+Kirby::plugin('username/mysection', array(
+    'sections' => array(
+        'mysection' => array(
+            'props' => array(
+                'sync' => function($sync = null) {
+                    return $sync;
+                },
+                // ...
+            ),
+        ),
+    ),
+);
+```
+
+- And fetch it in your `index.js`:
+
+```javascript
+export default {
+    props: {
+        sync:   String,
+        parent: String,
+        name:   String,
+    },
+    created() {
+        this.$api
+            .get(this.parent + "/sections/" + this.name)
+            .then(response => {
+                this.sync = response.sync
+            })
+    }
+}
+```
+> **Note:** The `parent | name` and API call is needed to set props for sections until the `$api.load()` helper [is fixed](https://github.com/k-next/kirby/issues/1062).
+
+- You now need to fetch the stored values of the whole page. To do so, in `index.js`, you'll first need to get the `id` of the page's form, then get its values ([ref](https://github.com/k-next/kirby/blob/6221a6b5b8d42aa4c04e6b01c642b8d52be64e36/panel/src/components/Sections/FieldsSection.vue#L30-L38)):
+
+```javascript
+export default {
+    computed: {
+        id() {
+            return this.$store.state.form.current
+        },
+        pageValues() {
+            return this.$store.getters["form/values"](this.id)
+        },
+    },
+}
+```
+
+- Add another `computed()` data to get only the value of the required field:
+
+```javascript
+export default {
+    computed: {
+        // ...
+        syncedValue() {
+            return this.sync && this.pageValues ? this.pageValues[this.sync] : false 
+        }
+    },
+}
+```
+
+- Optional: if you want to react on this value's changes, you'll need to watch it (`immediate: true` means we want to trigger the `handler()` function on first load):
+
+```javascript
+export default {
+    watch: {
+        pageValues: {
+            immediate: true,
+            handler() {
+                if(!this.syncedValue) return false
+                this.updatedSyncedValue()
+            }
+        }
+    },
+    methods: {
+        updatedSyncedValue() {
+            // do something with this.syncedValue
+        }
+    }
+}
+```
+
+- And if you want to change the field's value, you'll need to dispatch an `update` action (arguments are: `[id of the page's form, field name (string), new value]`, [ref](https://github.com/k-next/kirby/blob/6221a6b5b8d42aa4c04e6b01c642b8d52be64e36/panel/src/components/Sections/FieldsSection.vue#L54-L56)):
+
+```javascript
+export default {
+    methods: {
+        setSyncedFieldValue() {
+            if(this.sync) {
+                this.$store.dispatch("form/update", [this.id, this.sync, 'This is the new message'])
+            }
+        }
+    }
+}
+```
 
 <br/>
 
